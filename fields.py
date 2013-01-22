@@ -18,41 +18,41 @@
 from datetime import datetime
 
 def zpint(val):
-    '''
+    """
     Transfer value to integer
 
     return integer if right value else None
-    '''
+    """
     try:
         return int(val)
     except:
         return None
 
 def zpstr(val):
-    '''
+    """
     Transfer value to string
 
     return string if right value
-    '''
-    return unicode(val) if val != None else None
+    """
+    return unicode(val) if val is not None else None
 
 def zpdatetime(val):
-    '''
+    """
     Transfer value (must be as '2012-11-12') to date
 
     return datetime if right value else None
-    '''
+    """
     try:
         return val if isinstance(val, datetime) else datetime.strptime(val,'%Y-%m-%d')
     except:
         return None
 
 def zpfloat(val):
-    '''
+    """
     Transfer value to float
 
     return float if right value else None
-    '''
+    """
     try:
         return float(val)
     except:

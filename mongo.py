@@ -50,17 +50,17 @@ def zpid(val = None, create_new = False):
 
 
 class field:
-    '''
+    """
     This is field/col
-    '''
+    """
     def __init__(self, init_type = zpstr, init_value = None,):
         self.ztype = init_type
         self.zval = init_value
 
     def val(self, new_val = None):
-        '''
+        """
         just like jQuery, getter or setter.
-        '''
+        """
         if(new_val != None):
             if (self is not None): self.zval = new_val
         else:
@@ -68,9 +68,9 @@ class field:
             return self.zval
 
 class entity(dict):
-    '''
+    """
     这个是实体的基类
-    '''
+    """
     __table__ = None
 
     def __getattr__(self, name):
@@ -82,11 +82,11 @@ class entity(dict):
         self[name] = value
 
     def dump(self):
-        '''
+        """
         Have a look
         将实例中的属性和值输出出来
 
-        '''
+        """
         if (self is None):
             return None
         xdict = dict()
@@ -101,7 +101,7 @@ class entity(dict):
         将字典数据绑定到实体，在web.py中可以直接将web.input 绑定进来
 
         """
-        if (xdict is None): return None
+        if xdict is None: return None
 
         for k in self:
             xvalue = xdict[k] if xdict.has_key(k) else None
@@ -124,7 +124,7 @@ class entities:
 
     #TODO: 这个需要改造成多组分页显示
     def pager(self):
-        if (self.pagecount == 1):
+        if self.pagecount == 1:
             return ""
         prev_page = self.page - 1 if self.page - 1 > 0 else 1
         next_page = self.page + 1 if self.page + 1 <= self.pagecount else self.pagecount
@@ -132,12 +132,12 @@ class entities:
     <div class="pagination">\
         <ul>\
         '
-        if (self.page > 1):
+        if self.page > 1:
             html += '<li><a href="#" data-page="' + str(prev_page) + '">前页</a></li>'
         else:
             html += '<li class="disabled"><a href="#" data-page="' + str(prev_page) + '">前页</a></li>'
         for i in range(1, self.pagecount+1):
-            if (i == self.page):
+            if i == self.page:
                 html += '<li class="disabled"><a href="#" data-page="' + str(i) + '">' + str(i) + '</a></li>'
             else:
                 html += '<li><a href="#" data-page="' + str(i) + '">' + str(i) + '</a></li>'
@@ -161,11 +161,11 @@ db = connection.mongo_store
 
 
 def insert(instance):
-    '''
+    """
     Save an entity to db collection
     将实体插入数据库中
 
-    '''
+    """
     x_dict = dict()
     for k in instance:
         ori_val = instance[k].val()
@@ -180,44 +180,44 @@ def insert(instance):
 
 #TODO: UPDATE有bug，这个bug需要处理  
 def update(instance, where = None):
-    '''
+    """
     Update an entity to db collection.
     更新实体。
 
     if where is None, where's key is _id.
     如果未指定 where 字段，则使用 _id 作为更新条件。
-    '''
+    """
 
     x_dict = dict()
     for k in instance:
         ori_val = instance[k].val()
         lst_val = instance[k].ztype(ori_val)
-        if (lst_val is not None and k != '_id'):
+        if lst_val is not None and k != '_id':
             x_dict[k] = lst_val
-        if (k == '_id'):
+        if k == '_id':
             pk_val = lst_val
 
         x_dict[k] = lst_val
-    if (where == None and pk_val is not None):
+    if where is None and pk_val is not None:
         where = {'_id': pk_val}
 
 
-    if (where == None):
+    if where is None:
         raise ValueError()
 
     db[instance.__table__].update(where, {"$set": x_dict})
 
 
 def find_one(entity_type, where = None, _id = None):
-    '''
+    """
     查询出满足条件的一个记录，并把它放入实体
-    '''
-    if (where == None):
+    """
+    if where is None:
         where = dict()
-    if (_id != None):
+    if _id is not None:
         where["_id"] = zpid(str(_id))
     x_dict = db[entity_type.__table__].find_one(where)
-    if (x_dict is None): return None
+    if x_dict is None: return None
     instance = entity_type()
     instance.bind(x_dict)
     return instance
@@ -225,13 +225,13 @@ def find_one(entity_type, where = None, _id = None):
 
 
 def find(entity_type, where = None, orderby = None, size = 20, page = 1):
-    '''
+    """
     查询出满足条件的一个记录，并把它放入实体
-    '''
+    """
     list_all = db[entity_type.__table__].find(where)
-    if (list_all is None): return None
+    if list_all is None: return None
     count = list_all.count()
-    if (orderby is not None):
+    if orderby is not None:
         list_all.sort(orderby[0], orderby[1])
 
     page_count = count / size if count % size == 0 else count / size + 1
