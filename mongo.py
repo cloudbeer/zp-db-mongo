@@ -97,10 +97,10 @@ class entity(dict):
         return (xdict)
 
     def bind(self, xdict):
-        '''
+        """
         将字典数据绑定到实体，在web.py中可以直接将web.input 绑定进来
 
-        '''
+        """
         if (xdict is None): return None
 
         for k in self:
