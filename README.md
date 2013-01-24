@@ -1,10 +1,18 @@
 zp-db-mongo
 ===================
 
-This package is base data access for mongodb.
+
+This package is a data access layer for mongodb.
+
 这个包是访问 mongodb 的基础包
 
-Depends on pymongo
-依赖 pymongo
 
-Later i will change it to markdown.
+*********************************
+Notice: It is not accomplished
+
+请注意：这个包没有最后开发完成
+*********************************
+
+* Depends on pymongo
+* 依赖 pymongo
+
