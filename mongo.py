@@ -26,7 +26,8 @@
 
 from pymongo import MongoClient
 from bson.objectid import ObjectId
-from fields import zpstr
+from fields import zpstr, zpdatetime
+from datetime import datetime
 
 def zpid(val = None, create_new = False):
     """
@@ -37,13 +38,13 @@ def zpid(val = None, create_new = False):
     返回一个 objectid 对象，或者创建一个新的，或者返回 None
     """
     try:
-        if (isinstance(val, ObjectId)):
+        if isinstance(val, ObjectId):
             return val
-        if (isinstance(val, str)):
+        if isinstance(val, unicode):
             return ObjectId(val)
 
     except:
-        if (create_new): return ObjectId()
+        if create_new: return ObjectId()
         else: return None
 
 
@@ -61,10 +62,10 @@ class field:
         """
         just like jQuery, getter or setter.
         """
-        if(new_val != None):
-            if (self is not None): self.zval = new_val
+        if new_val is not None:
+            if self is not None: self.zval = new_val
         else:
-            if (self is None): return None
+            if self is None: return None
             return self.zval
 
 class entity(dict):
@@ -72,9 +73,15 @@ class entity(dict):
     这个是实体的基类
     """
     __table__ = None
+    def __init__(self):
+        self._id = field(zpid)
+        self.create_date = field(zpdatetime, datetime.now())
+        self.update_date = field(zpdatetime)
+        self.creator = field(zpid)
+        self.updater = field(zpid)
 
     def __getattr__(self, name):
-        if (self.has_key(name)):
+        if self.has_key(name):
             return self[name]
         else:
             return field(init_value=None)
@@ -87,14 +94,12 @@ class entity(dict):
         将实例中的属性和值输出出来
 
         """
-        if (self is None):
+        if self is None:
             return None
         xdict = dict()
-        print(self.keys())
         for k in self:
-            print (0)
             xdict[k] = self[k].val()
-        return (xdict)
+        return xdict
 
     def bind(self, xdict):
         """
@@ -133,18 +138,18 @@ class entities:
         <ul>\
         '
         if self.page > 1:
-            html += '<li><a href="#" data-page="' + str(prev_page) + '">前页</a></li>'
+            html += '<li><a href="#" data-page="' + unicode(prev_page) + '">前页</a></li>'
         else:
-            html += '<li class="disabled"><a href="#" data-page="' + str(prev_page) + '">前页</a></li>'
+            html += '<li class="disabled"><a href="#" data-page="' + unicode(prev_page) + '">前页</a></li>'
         for i in range(1, self.pagecount+1):
             if i == self.page:
-                html += '<li class="disabled"><a href="#" data-page="' + str(i) + '">' + str(i) + '</a></li>'
+                html += '<li class="disabled"><a href="#" data-page="' + unicode(i) + '">' + unicode(i) + '</a></li>'
             else:
-                html += '<li><a href="#" data-page="' + str(i) + '">' + str(i) + '</a></li>'
+                html += '<li><a href="#" data-page="' + unicode(i) + '">' + unicode(i) + '</a></li>'
         if self.page < self.pagecount:
-            html += '<li><a href="#" data-page="' + str(next_page) + '">后页</a></li>'
+            html += '<li><a href="#" data-page="' + unicode(next_page) + '">后页</a></li>'
         else:
-            html += '<li class="disabled"><a href="#" data-page="' + str(next_page) + '">后页</a></li>'
+            html += '<li class="disabled"><a href="#" data-page="' + unicode(next_page) + '">后页</a></li>'
         html += '\
         </ul>\
     </div>'
@@ -178,7 +183,7 @@ def insert(instance):
 
     db[instance.__table__].insert(x_dict)
 
-#TODO: UPDATE有bug，这个bug需要处理  
+
 def update(instance, where = None):
     """
     Update an entity to db collection.
@@ -197,13 +202,12 @@ def update(instance, where = None):
         if k == '_id':
             pk_val = lst_val
 
-        x_dict[k] = lst_val
     if where is None and pk_val is not None:
         where = {'_id': pk_val}
 
 
     if where is None:
-        raise ValueError()
+        raise ValueError('Must have an where condition')
 
     db[instance.__table__].update(where, {"$set": x_dict})
 
@@ -215,7 +219,7 @@ def find_one(entity_type, where = None, _id = None):
     if where is None:
         where = dict()
     if _id is not None:
-        where["_id"] = zpid(str(_id))
+        where["_id"] = zpid(unicode(_id))
     x_dict = db[entity_type.__table__].find_one(where)
     if x_dict is None: return None
     instance = entity_type()
@@ -226,7 +230,8 @@ def find_one(entity_type, where = None, _id = None):
 
 def find(entity_type, where = None, orderby = None, size = 20, page = 1):
     """
-    查询出满足条件的一个记录，并把它放入实体
+    Query, and put objects to an list
+    查询出满足条件的所有记录，并把它放入实体集合
     """
     list_all = db[entity_type.__table__].find(where)
     if list_all is None: return None
@@ -253,6 +258,15 @@ def find(entity_type, where = None, orderby = None, size = 20, page = 1):
     return bindsList
 
 
+def remove(entity_type,  where = None,  _id = None):
+    """
+    Delete some/one object from db.
+    """
+    if where is None:
+        where = dict()
+    if _id is not None:
+        where["_id"] = zpid(unicode(_id))
+    db[entity_type.__table__].remove(where)
 
 
 

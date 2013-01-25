@@ -26,6 +26,7 @@ def zpint(val):
     try:
         return int(val)
     except:
+        #if isinstance(default, int) and default is not None: return default
         return None
 
 def zpstr(val):
@@ -56,6 +57,7 @@ def zpfloat(val):
     try:
         return float(val)
     except:
+        #if isinstance(default, float) and default is not None: return default
         return None
 
 def zpnone(val):
