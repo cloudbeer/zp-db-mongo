@@ -128,7 +128,8 @@ class entities:
 
 
     #TODO: 这个需要改造成多组分页显示
-    def pager(self):
+    def pager(self, lalbe_prev='Prev', label_next='Next', label_prev_group='Prev Group',
+              label_next_group='Next Group', label_first='First Page', label_Last='Last Page'):
         if self.pagecount == 1:
             return ""
         prev_page = self.page - 1 if self.page - 1 > 0 else 1
@@ -138,18 +139,19 @@ class entities:
         <ul>\
         '
         if self.page > 1:
-            html += '<li><a href="#" data-page="' + unicode(prev_page) + '">前页</a></li>'
+            html += '<li><a href="#" data-page="' + unicode(prev_page) + '">'+ lalbe_prev +'</a></li>'
         else:
-            html += '<li class="disabled"><a href="#" data-page="' + unicode(prev_page) + '">前页</a></li>'
+            html += '<li class="disabled"><a href="#" data-page="' + unicode(prev_page) + '">'+lalbe_prev+'</a></li>'
         for i in range(1, self.pagecount+1):
             if i == self.page:
                 html += '<li class="disabled"><a href="#" data-page="' + unicode(i) + '">' + unicode(i) + '</a></li>'
             else:
                 html += '<li><a href="#" data-page="' + unicode(i) + '">' + unicode(i) + '</a></li>'
         if self.page < self.pagecount:
-            html += '<li><a href="#" data-page="' + unicode(next_page) + '">后页</a></li>'
+            html += '<li><a href="#" data-page="' + unicode(next_page) + '">'+label_next+'</a></li>'
+
         else:
-            html += '<li class="disabled"><a href="#" data-page="' + unicode(next_page) + '">后页</a></li>'
+            html += '<li class="disabled"><a href="#" data-page="' + unicode(next_page) + '">'+label_next+'</a></li>'
         html += '\
         </ul>\
     </div>'
